@@ -1,5 +1,5 @@
 <?php
-$con = mysqli_connect('localhost', 'mahapagec_login', 'KDdfYLKxUVJC4RfJ2kqa', 'mahapagec_login');
+$con = mysqli_connect('localhost', 'login', '***********', 'login');
 $url = "http://localhost/";
 function createTabel(){
     global $con;
