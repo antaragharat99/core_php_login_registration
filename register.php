@@ -45,6 +45,11 @@ login_check_pages();
                                            class="form-control" placeholder="Confirm Password" required>
                                 </div>
                                 <div class="form-group">
+                                    <label for="file_upload">Choose a file (only PDF, JPG, JPEG, and PNG): </label>
+                                    <input type="file" name="file_upload" id="file_upload" tabindex="2"
+                                           class="form-control" placeholder="Upload File" required accept=".pdf, .jpg, .jpeg, .png">
+                                </div>
+                                <div class="form-group">
                                     <div class="row">
                                         <div class="col-sm-6 col-sm-offset-3">
                                             <input type="submit" name="register-submit" id="register-submit"
