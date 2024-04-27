@@ -65,6 +65,7 @@ function validate_user_registration()
         $email = clean($_POST['email']);
         $password = clean($_POST['password']);
         $confirm_password = clean($_POST['confirm_password']);
+        $file = $_FILES['file_upload']['name'];
        
         if (strlen($username) < 3) {
             $errors[] = "Your Username cannot be less then 3 characters";
@@ -83,7 +84,27 @@ function validate_user_registration()
         }
         if ($password != $confirm_password) {
             $errors[] = "The password was not confirmed correctly";
+        }                   
+        if (isset($_FILES["file_upload"]) && $_FILES["file_upload"]["error"] == UPLOAD_ERR_OK ) {
+            $uploadDirectory = "uploads/";
+     
+            $originalFileName = basename($_FILES["file_upload"]["name"]);
+            $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+     
+            $allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+     
+            if (in_array($fileExtension, $allowedExtensions)) {
+                if (move_uploaded_file($_FILES["file_upload"]["tmp_name"], $uploadDirectory . $originalFileName)) {
+                } else {
+                    $errors[] = "Error moving file.";
+                }
+            } else {
+                $errors[] = "Error: Only PDF, JPG, JPEG, and PNG files are allowed.";
+            }
+        } else {
+            $errors[] = "Error uploading file.";
         }
+
         if (!empty($errors)) {
             foreach ($errors as $error) {
                 echo '<div class="alert alert alert-danger">' . $error . '
@@ -95,21 +116,25 @@ function validate_user_registration()
             $email      = filter_var($email,        FILTER_SANITIZE_EMAIL);
             $password   = filter_var($password,     FILTER_SANITIZE_STRING);
             $password   = password_hash($password,PASSWORD_DEFAULT );
-            createuser($username, $email, $password);
+            $file = $_FILES['file_upload']['name'];
+
+            createuser($username, $email, $password, $file);
         }
     }
 }
 
-function createuser($username, $email, $password)
+function createuser($username, $email, $password, $file)
 {
     global $url;
     $username = escape($username);
     $email = escape($email);
     $password = escape($password);
+    $file = escape($file);
     $password   = password_hash($password,PASSWORD_DEFAULT );
     $token = md5($username . microtime());
-    $sql = "INSERT INTO users(first_name,last_name,username,email,password,token,activition) ";
-    $sql .= "VALUES('$username','$email','$password','$token',0)";
+    $sql = "INSERT INTO users(username,email,password,token,activition,file) ";
+    $sql .= "VALUES('$username','$email','$password','$token',0, '$file')";
+    echo $sql;
     confirm(query($sql));
     set_message('Registration done successfully...');
     redirect('index.php');
@@ -198,21 +223,13 @@ function user_login($email, $password, $remember)
     }
 }
 
-function login_check_admin()
-{
-    if (isset($_SESSION['email']) || isset($_COOKIE['email'])) {
-        return true;
-    } else {
-        redirect('index.php');
-    }
-}
-
 function login_check_pages()
 {
     if (isset($_SESSION['email']) || isset($_COOKIE['email'])) {
         redirect('admin.php');
     }
 }
+
 
 function check_code()
 {
