@@ -9,6 +9,7 @@ function createTabel(){
                 email VARCHAR(255) NOT NULL,
                 password TEXT NOT NULL,
                 token TEXT NOT NULL,
+                file VARCHAR(255) NOT NULL,
                 activition tinyint(4)  NOT NULL Default 0)";
     $con->query($query);
 }
